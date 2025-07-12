@@ -1,0 +1,113 @@
+extends CharacterBody2D
+
+@export var attr: PlayerAttributes
+
+var dead: bool = false
+var diving: bool = false
+
+var jumps_used: int = 0
+var dives_used: int = 0
+var jump_cooldown: float = 0.0
+var dive_cooldown: float = 0.0
+var direction: float = 0
+
+signal hasDied()
+
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var animation_player: AnimationPlayer = $AnimatedSprite2D/AnimationPlayer
+
+func _onready():
+	diving = false
+	dead = false
+	
+func _physics_process(delta: float) -> void:
+	#print("diving: %s, dives_used: %d, dive_cooldown: %d, rotation: %f, is_on_floor: %s" % [diving, dives_used, dive_cooldown, animated_sprite.rotation, is_on_floor()])
+
+	gravity_handler(delta)
+	direction = 0
+	if not dead:
+		dive_handler(delta)
+		jump_handler(delta)
+		direction = direction_handler()
+		movement_animation_handler()
+		
+	velocity_handler()
+	move_and_slide()
+
+func gravity_handler(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+
+func dive_handler(delta):
+	# Handle diving
+	if diving:
+		# Face the dive
+		look_at(velocity)
+
+	if dive_cooldown > 0.0:
+		dive_cooldown -= delta * 1000 # convert to ms
+	if is_on_floor() && dives_used > 0: # we know we've dived 
+		rotation = 0.0
+		animated_sprite.play("dive_end")
+		dives_used = 0
+		diving = false
+	if Input.is_action_just_pressed("dive") and dives_used < attr.MAX_DIVES && dive_cooldown <= 0.0:
+		var dive_direction: Vector2 = (get_global_mouse_position() - global_position).normalized()
+		animation_player.queue("dive_start")
+		velocity = dive_direction * attr.DIVE_VELOCITY
+		print("%s | %s" % [dive_direction, velocity])
+
+		look_at(velocity)
+		animated_sprite.flip_h = sign(velocity.x) < 0
+		
+		dives_used += 1
+		diving = true
+		dive_cooldown = attr.MAX_DIVE_COOLDOWN
+		
+func jump_handler(delta):
+	# Handle jump.
+	if jump_cooldown > 0.0:
+		jump_cooldown -= delta * 1000 # convert to ms
+	if is_on_floor():
+		jumps_used = 0
+	if Input.is_action_just_pressed("jump") and jumps_used < attr.MAX_JUMPS && jump_cooldown <= 0.0:
+		diving = false
+		velocity.y = attr.JUMP_VELOCITY
+		jumps_used += 1
+		jump_cooldown = attr.MAX_JUMP_COOLDOWN
+
+
+func direction_handler():
+	if !diving:
+		direction = Input.get_axis("move_left", "move_right")
+		if direction > 0:
+			animated_sprite.flip_h = false
+		if direction < 0:
+			animated_sprite.flip_h = true		
+	return direction
+
+func movement_animation_handler():
+	if !diving && (animated_sprite.animation != "dive_end" || !animated_sprite.is_playing()):
+		if !is_on_floor():
+			animated_sprite.play("jump")
+		elif direction == 0:
+			animated_sprite.play("idle")	
+		else:
+			animated_sprite.play("run")
+		
+func velocity_handler():
+	if direction:
+		velocity.x = direction * attr.SPEED
+	elif dead:
+		velocity.x = move_toward(velocity.x, 0, attr.SPEED/80)
+	elif !diving:
+		velocity.x = move_toward(velocity.x, 0, attr.SPEED)
+	
+func die():
+	if not dead:
+		print("death")
+		hasDied.emit()
+		dead = true
+		rotation = 0.0
+		animated_sprite.play("death")

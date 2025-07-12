@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3 uid="uid://ia05j7b6f0n2"]
+
+[ext_resource type="PackedScene" uid="uid://dk4cxaabuugcv" path="res://scenes/Player.tscn" id="1_ms2ug"]
+[ext_resource type="Script" uid="uid://bd6dnyanve0n6" path="res://scripts/canvas_layer.gd" id="2_1hwwh"]
+[ext_resource type="FontFile" uid="uid://bhrch0avcxhd2" path="res://assets/fonts/PixelOperator8-Bold.ttf" id="3_itpbj"]
+[ext_resource type="PackedScene" uid="uid://8pxecynoypia" path="res://levels/example_world.tscn" id="4_ms2ug"]
+
+[node name="ExampleLevel" type="Node2D"]
+physics_interpolation_mode = 1
+
+[node name="Player" parent="." instance=ExtResource("1_ms2ug")]
+z_index = 5
+position = Vector2(-263, -6)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2(1, 0)
+zoom = Vector2(2, 2)
+process_callback = 0
+limit_bottom = 200
+limit_smoothed = true
+position_smoothing_enabled = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource("2_1hwwh")
+
+[node name="ScoreCounter" type="Label" parent="CanvasLayer"]
+z_index = 7
+anchors_preset = -1
+anchor_left = -0.001
+anchor_top = 0.006
+anchor_right = -0.001
+anchor_bottom = 0.006
+offset_left = -0.848
+offset_top = 5.112
+offset_right = 283.152
+offset_bottom = 69.112
+theme_override_fonts/font = ExtResource("3_itpbj")
+theme_override_font_sizes/font_size = 32
+text = "Coins: 0"
+horizontal_alignment = 1
+autowrap_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Death" type="Label" parent="CanvasLayer"]
+offset_left = 350.0
+offset_top = 107.0
+offset_right = 814.0
+offset_bottom = 171.0
+theme_override_fonts/font = ExtResource("3_itpbj")
+theme_override_font_sizes/font_size = 64
+text = "You Died"
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(28.96, 16.28)
+color = Color(1, 1, 1, 0)
+
+[node name="ExampleWorld" parent="." instance=ExtResource("4_ms2ug")]
+
+[connection signal="hasDied" from="Player" to="CanvasLayer" method="_on_player_has_died"]

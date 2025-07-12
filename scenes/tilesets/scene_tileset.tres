@@ -1,0 +1,11 @@
+[gd_resource type="TileSet" load_steps=4 format=3 uid="uid://cbqhhb8s3xmfn"]
+
+[ext_resource type="PackedScene" uid="uid://gsriuson0w7c" path="res://scenes/interactibles/coin.tscn" id="1_3dclw"]
+[ext_resource type="PackedScene" uid="uid://dtj04l2nvo8yu" path="res://scenes/enemies/slime.tscn" id="2_m1icm"]
+
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_c2vku"]
+scenes/1/scene = ExtResource("1_3dclw")
+scenes/2/scene = ExtResource("2_m1icm")
+
+[resource]
+sources/0 = SubResource("TileSetScenesCollectionSource_c2vku")
