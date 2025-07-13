@@ -1,4 +1,4 @@
-extends Node2D
+extends CharacterBody2D
 
 const SPEED: int = 60
 
@@ -18,3 +18,11 @@ func _process(delta: float) -> void:
 		direction = 1
 		animated_sprite.flip_h = false
 	position.x += direction * SPEED * delta
+	gravity_handler(delta)
+	move_and_slide()
+
+
+func gravity_handler(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity += get_gravity() * delta
