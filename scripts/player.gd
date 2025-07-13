@@ -4,6 +4,7 @@ extends CharacterBody2D
 
 var dead: bool = false
 var diving: bool = false
+var sprinting: bool = false
 var charging_dive: bool = false
 
 var jumps_used: int = 0
@@ -82,7 +83,6 @@ func dive_handler(delta):
 		var dive_direction: Vector2 = (get_global_mouse_position() - global_position).normalized()
 		animation_player.queue("dive_start")
 		velocity = dive_direction * attr.DIVE_VELOCITY * (0.7 + charge_dive_percent)
-		print("%s | %s" % [dive_direction, velocity])
 		
 		motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 		animated_sprite.look_at(velocity)
@@ -116,21 +116,31 @@ func direction_handler():
 		if direction > 0:
 			animated_sprite.flip_h = false
 		if direction < 0:
-			animated_sprite.flip_h = true		
+			animated_sprite.flip_h = true
 	return direction
 
 func movement_animation_handler():
 	if !diving && (animated_sprite.animation != "dive_end" || !animated_sprite.is_playing()):
-		if !is_on_floor():
-			animated_sprite.play("jump")
-		elif direction == 0:
-			animated_sprite.play("idle")	
+		if is_on_floor() && Input.is_action_pressed("sprint") && direction != 0:
+			sprinting = true
+			animated_sprite.play("sprint")
 		else:
-			animated_sprite.play("run")
+			if !is_on_floor():
+				animated_sprite.play("jump")
+			elif direction == 0:
+				animated_sprite.play("idle")
+				sprinting = false
+			else:
+				animated_sprite.play("run")
+				sprinting = false
+
 		
 func velocity_handler():
+	var velocity_modifier: float = 1
+	if sprinting:
+		velocity_modifier *= attr.SPRINT_MULTIPLIER
 	if direction:
-		velocity.x = direction * attr.SPEED
+		velocity.x = direction * attr.SPEED * velocity_modifier
 	elif dead:
 		velocity.x = move_toward(velocity.x, 0, attr.SPEED/80)
 	elif !diving:

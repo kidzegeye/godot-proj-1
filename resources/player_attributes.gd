@@ -11,3 +11,4 @@ class_name PlayerAttributes
 @export var DIVE_CHARGE_RATE: float = 2
 @export var RETICLE_MIN_DISTANCE: float = 10
 @export var RETICLE_MAX_DISTANCE: float = 50
+@export var SPRINT_MULTIPLIER: float = 1.5
