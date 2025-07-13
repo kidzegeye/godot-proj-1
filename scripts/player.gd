@@ -30,10 +30,6 @@ func _ready():
 	
 func _physics_process(delta: float) -> void:
 	#print("diving: %s, dives_used: %d, dive_cooldown: %d, rotation: %f, is_on_floor: %s" % [diving, dives_used, dive_cooldown, animated_sprite.rotation, is_on_floor()])
-	if attr.RETICLE_MAX_DISTANCE*charge_dive_percent < attr.RETICLE_MIN_DISTANCE:
-		reticle.hide()
-	else:
-		reticle.show()
 	gravity_handler(delta)
 	direction = 0
 	if not dead:
@@ -51,6 +47,10 @@ func gravity_handler(delta):
 		velocity += get_gravity() * delta
 
 func dive_handler(delta):
+	if attr.RETICLE_MAX_DISTANCE*charge_dive_percent < attr.RETICLE_MIN_DISTANCE:
+		reticle.hide()
+	else:
+		reticle.show()
 	# Handle diving
 	if diving:
 		# Face the dived
@@ -141,5 +141,6 @@ func die():
 		print("death")
 		hasDied.emit()
 		dead = true
+		reticle.hide()
 		animated_sprite.rotation = 0.0
 		animated_sprite.play("death")
