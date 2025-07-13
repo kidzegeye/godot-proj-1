@@ -13,9 +13,7 @@ MAX_JUMPS = 2
 MAX_DIVES = 2
 MAX_JUMP_COOLDOWN = 50.0
 MAX_DIVE_COOLDOWN = 250.0
-DIVE_CHARGE_RATE = 2.0
-RETICLE_MIN_DISTANCE = 10.0
-RETICLE_MAX_DISTANCE = 50.0
+DIVE_CHARGE_RATE = 1.0
 metadata/_custom_type_script = "uid://d838p4tjmy3y"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v6fml"]
@@ -369,8 +367,6 @@ position = Vector2(0, -2)
 shape = SubResource("CircleShape2D_kne1u")
 
 [node name="Reticle" type="Polygon2D" parent="."]
-modulate = Color(1, 0, 0, 1)
 position = Vector2(0, -2)
 scale = Vector2(1, 1.27273)
-offset = Vector2(2, -2.98023e-07)
-polygon = PackedVector2Array(8, 5.5, 8, -5.5, 12, 0)
+polygon = PackedVector2Array(8, 7, 8, -7, 12, 0)
